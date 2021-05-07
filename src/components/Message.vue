@@ -1,56 +1,69 @@
 <template>
-  <div>
-    <div v-for="(value, index) in shares" :key="index">
-      <div class="message">
-        <div class="flex">
-          <p class="name">{{value.name}}</p>
-          <img class="icon" src="../assets/heart.png" />
-          <p class="number">{{value.like.length}}</p>
-          <img class="icon" src="../assets/cross.png" />
-          <img class="icon detail" src="../assets/detail.png" />
-        </div>
-        <p class="text">{{value.share}}</p>
-      </div>
+  <div class="share">
+    <p>シェア</p>
+    <textarea v-model="share"></textarea>
+    <div @click="send">
+      <button>シェアする</button>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
-      shares: [{ name: "太郎", like: [], share: "初めまして" }]
+      share: "",
     };
-  }
+  },
+  methods: {
+    send() {
+      if (this.share === "") {
+        alert("シェアする内容を入力してください");
+      } else {
+        axios
+          .post("https://murmuring-fortress-77784.herokuapp.com/api/shares", {
+            user_id: this.$store.state.user.id,
+            share: this.share,
+          })
+          .then((response) => {
+            console.log(response);
+            alert("シェアしました");
+            this.share = "";
+            this.$router.go({
+              path: this.$router.currentRoute.path,
+              force: true,
+            });
+          });
+      }
+    },
+  },
 };
 </script>
 
 <style scoped>
-.flex {
-  display: flex;
+.share {
+  margin: 15px;
 }
-.icon {
-  width: 25px;
-  height: 25px;
+.share textarea {
+  width: 95%;
+  height: 120px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid white;
+  background-color: #15202b;
+  color: white;
+  resize: none;
 }
-.detail {
-  margin-left: 50px;
-}
-.message {
-  padding: 20px;
-  border-bottom: solid 1px white;
-  border-left: solid 1px white;
-}
-.name {
-  font-size: 18px;
-  font-weight: bold;
-  margin-right: 10px;
-}
-.text {
-  margin-top: 10px;
-}
-.number {
-  margin-left: 10px;
-  margin-right: 10px;
+button {
+  width: 100px;
+  text-align: center;
+  padding: 8px 0 10px;
+  color: #fff;
+  background-color: #5419da;
+  border-radius: 25px;
+  display: block;
+  margin: 0 0 0 auto;
 }
 </style>
